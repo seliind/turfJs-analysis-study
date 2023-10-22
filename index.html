@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stop Smoking Services</title>
+    <link rel="stylesheet" href="style.css"/>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+  </head>
+  <body>
+    <div id="map"></div>
+    <footer>
+        <a style="display: none;" href="https://www.flaticon.com/free-icons/user" title="user icons">User icons created by Freepik - Flaticon</a>
+    </footer>
+
+    <script src="https://unpkg.com/@turf/turf@latest/turf.min.js"></script>
+
+    <script>
+        const map = L.map('map').setView([53.7267, -1.8577], 12);
+        const femaleIcon = L.icon({
+            iconUrl: './images/female.png',
+            iconSize:     [38, 40], 
+            iconAnchor:   [22, 40], 
+            popupAnchor:  [-3, -76] 
+        });
+
+        const maleIcon = L.icon({
+            iconUrl: './images/male.png',
+            iconSize:     [38, 40], 
+            iconAnchor:   [22, 40], 
+            popupAnchor:  [-3, -76] 
+        });
+
+        const baseLayers = {
+            "Base Map": L.tileLayer(
+              "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+              {
+                maxZoom: 19,
+                attribution: "© OpenStreetMap",
+              }
+            ).addTo(map),
+            "Esri World Street Map": L.tileLayer(
+              "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+              {
+                attribution:
+                  "Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012",
+              }
+            ),
+          };
+        const overLayers = {};
+        
+
+        fetch('data/services.geojson').then(response => response.json())
+        .then(data => {
+          const services = L.geoJSON(data, {
+                pointToLayer: function (feature, latlng) {
+                    return L.marker(latlng);
+                },
+                onEachFeature: function (feature, layer) {
+                    layer.bindPopup('<b>' + feature.properties.Location + '</b><br>' + feature.properties.Address);
+                }
+            });
+            overLayers["Stop Smoking Services"] = services;
+        }).then(() => {
+            fetch('data/people.geojson')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+              const people =  L.geoJSON(data, {
+                    pointToLayer: function(feature, latlng) {
+                        if (feature.properties.Sex == "Female") {
+                            return L.marker(latlng, { icon: femaleIcon });
+                        } else {
+                            return L.marker(latlng, { icon: maleIcon });
+                        }
+                    },
+                    onEachFeature: function(feature, layer) {
+                        layer.bindPopup('<b>' + feature.properties.Name + '</b><br>' + feature.properties.Sex);
+                    }
+                });
+                overLayers["People"] = people;
+                L.control.layers(baseLayers, overLayers).addTo(map);
+                console.log(people)
+                const bboxLayer =L.geoJSON(people.toGeoJSON());
+                const bbox = turf.bbox(bboxLayer.toGeoJSON());
+                var bounds = L.latLngBounds([bbox[1], bbox[0]], [bbox[3], bbox[2]]);
+                var bboxRectangle = L.rectangle(bounds, { color: 'red', weight: 2, fill: false });
+                bboxRectangle.addTo(map);
+            })
+        }).catch(error => console.error(error));
+
+        
+
+    </script>
+  </body>
+</html>

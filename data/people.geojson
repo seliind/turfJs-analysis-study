@@ -1,0 +1,71 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "Name": "Jerry Seinfeld",
+                "Sex": "Male"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-1.8577, 53.7267]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "Name": "Emily Johnson",
+                "Sex": "Female"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-1.8450, 53.7260]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "Name": "William Brown",
+                "Sex": "Male"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-1.8750, 53.7175]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "Name": "Cosmos Kramer",
+                "Sex": "Female"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [ -1.8450, 53.7100]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "Name": "James Smith",
+                "Sex": "Male"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [ -1.9758, 53.6957]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "Name": "Oliver Taylor",
+                "Sex": "Male"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [ -1.9251, 53.7393]
+            }
+        }
+    ]
+}
