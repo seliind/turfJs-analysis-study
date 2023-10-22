@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Stop Smoking Services</title>
-    <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="style.css" />
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -19,88 +19,198 @@
   </head>
   <body>
     <div id="map"></div>
+    <div id="map-legend">
+      <h1 class="legend-label">Legend</h1>
+      <div class="row">
+        <div class="col-6 icon-container">
+          <img class="legend-img" src="./images/rectangle.png" alt="icon" />
+        </div>
+        <div class="col-6"><p>People Border Box</p></div>
+      </div>
+      <div class="row">
+        <div class="col-6 icon-container">
+          <img class="legend-img" src="./images/female.png" alt="icon" />
+
+          <img class="legend-img" src="./images/male.png" alt="icon" />
+        </div>
+        <div class="col-6"><p>Female or Male People</p></div>
+      </div>
+      <div class="row">
+        <div class="col-6 icon-container">
+          <img class="legend-img" src="./images/placeholder.png" alt="icon" />
+        </div>
+        <div class="col-6"><p>Stop Smoking Service</p></div>
+      </div>
+      <div class="row">
+        <div class="col-6 icon-container">
+          <img class="legend-img" src="./images/arrows.png" alt="icon" />
+        </div>
+        <div class="col-6"><p>Center point of people</p></div>
+      </div>
+      <div class="row">
+        <div class="col-6 icon-container">
+          <img class="legend-img" src="./images/nearby.png" alt="icon" />
+        </div>
+        <div class="col-6"><p>Nearest service to the center point</p></div>
+      </div>
+    </div>
     <footer>
-        <a style="display: none;" href="https://www.flaticon.com/free-icons/user" title="user icons">User icons created by Freepik - Flaticon</a>
+      <a
+        style="display: none"
+        href="https://www.flaticon.com/free-icons/user"
+        title="user icons"
+        >User icons created by Freepik - Flaticon</a
+      >
     </footer>
 
     <script src="https://unpkg.com/@turf/turf@latest/turf.min.js"></script>
 
     <script>
-        const map = L.map('map').setView([53.7267, -1.8577], 12);
-        const femaleIcon = L.icon({
-            iconUrl: './images/female.png',
-            iconSize:     [38, 40], 
-            iconAnchor:   [22, 40], 
-            popupAnchor:  [-3, -76] 
-        });
+      const legendElement = document.getElementById('map-legend');
+      const map = L.map("map").setView([53.7267, -1.8577], 12);
+      const femaleIcon = L.icon({
+        iconUrl: "./images/female.png",
+        iconSize: [38, 40],
+        iconAnchor: [22, 40],
+        popupAnchor: [-3, -76],
+      });
 
-        const maleIcon = L.icon({
-            iconUrl: './images/male.png',
-            iconSize:     [38, 40], 
-            iconAnchor:   [22, 40], 
-            popupAnchor:  [-3, -76] 
-        });
+      const maleIcon = L.icon({
+        iconUrl: "./images/male.png",
+        iconSize: [38, 40],
+        iconAnchor: [22, 40],
+        popupAnchor: [-3, -76],
+      });
 
-        const baseLayers = {
-            "Base Map": L.tileLayer(
-              "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-              {
-                maxZoom: 19,
-                attribution: "© OpenStreetMap",
-              }
-            ).addTo(map),
-            "Esri World Street Map": L.tileLayer(
-              "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
-              {
-                attribution:
-                  "Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012",
-              }
-            ),
-          };
-        const overLayers = {};
-        
+      const centerIcon = L.icon({
+        iconUrl: "./images/arrows.png",
+        iconSize: [38, 40],
+        iconAnchor: [22, 40],
+        popupAnchor: [-3, -76],
+      });
+      const nearestIcon = L.icon({
+        iconUrl: "./images/nearby.png",
+        iconSize: [38, 40],
+        iconAnchor: [22, 40],
+        popupAnchor: [-3, -76],
+      });
 
-        fetch('data/services.geojson').then(response => response.json())
-        .then(data => {
+      const baseLayers = {
+        "Base Map": L.tileLayer(
+          "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+          {
+            maxZoom: 19,
+            attribution: "© OpenStreetMap",
+          }
+        ).addTo(map),
+        "Esri World Street Map": L.tileLayer(
+          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+          {
+            attribution:
+              "Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012",
+          }
+        ),
+      };
+      const overLayers = {};
+
+      fetch("data/services.geojson")
+        .then((response) => response.json())
+        .then((data) => {
+          const servicesData = data;
           const services = L.geoJSON(data, {
+            pointToLayer: function (feature, latlng) {
+              return L.marker(latlng);
+            },
+            onEachFeature: function (feature, layer) {
+              layer.bindPopup(
+                "<b>" +
+                  feature.properties.Location +
+                  "</b><br>" +
+                  feature.properties.Address
+              );
+            },
+          });
+          overLayers["Stop Smoking Services"] = services;
+          return servicesData;
+        })
+        .then((servicesData) => {
+          fetch("data/people.geojson")
+            .then((response) => response.json())
+            .then((data) => {
+              const centerPoint = turf.center(data);
+              L.geoJSON(centerPoint, {
                 pointToLayer: function (feature, latlng) {
-                    return L.marker(latlng);
+                  return L.marker(latlng, { icon: centerIcon });
+                },
+              })
+                .addTo(map)
+                .bindPopup("Center point of people");
+              const nearestService = turf.nearest(centerPoint, servicesData);
+
+              L.geoJSON(nearestService, {
+                pointToLayer: function (feature, latlng) {
+                  return L.marker(latlng, { icon: nearestIcon });
+                },
+              })
+                .addTo(map)
+                .bindPopup(
+                  "Chosen service is <b>The Pharmacy Group</b></br> Nearest service to center point."
+                );
+              const people = L.geoJSON(data, {
+                pointToLayer: function (feature, latlng) {
+                  if (feature.properties.Sex == "Female") {
+                    return L.marker(latlng, { icon: femaleIcon });
+                  } else {
+                    return L.marker(latlng, { icon: maleIcon });
+                  }
                 },
                 onEachFeature: function (feature, layer) {
-                    layer.bindPopup('<b>' + feature.properties.Location + '</b><br>' + feature.properties.Address);
-                }
+                  const distance = turf.distance(
+                    nearestService,
+                    feature.geometry.coordinates,
+                    { units: "kilometers" }
+                  );
+
+                  const roundedDistance = distance.toFixed(2);
+                  layer.bindPopup(
+                    "<b>" +
+                      feature.properties.Name +
+                      "</b><br>" +
+                      feature.properties.Sex +
+                      `<br> I am ${roundedDistance} km far from the chosen service!`
+                  );
+                },
+              });
+              overLayers["People"] = people;
+              L.control.layers(baseLayers, overLayers).addTo(map);
+              overLayers["People"].addTo(map);
+              const bboxLayer = L.geoJSON(people.toGeoJSON());
+              const bbox = turf.bbox(bboxLayer.toGeoJSON());
+              var bounds = L.latLngBounds(
+                [bbox[1], bbox[0]],
+                [bbox[3], bbox[2]]
+              );
+              var bboxRectangle = L.rectangle(bounds, {
+                color: "red",
+                weight: 2,
+                fill: false,
+              });
+              bboxRectangle.addTo(map).bindPopup("Bounding box of people");
             });
-            overLayers["Stop Smoking Services"] = services;
-        }).then(() => {
-            fetch('data/people.geojson')
-            .then(response => response.json())
-            .then(data => {
-                console.log(data)
-              const people =  L.geoJSON(data, {
-                    pointToLayer: function(feature, latlng) {
-                        if (feature.properties.Sex == "Female") {
-                            return L.marker(latlng, { icon: femaleIcon });
-                        } else {
-                            return L.marker(latlng, { icon: maleIcon });
-                        }
-                    },
-                    onEachFeature: function(feature, layer) {
-                        layer.bindPopup('<b>' + feature.properties.Name + '</b><br>' + feature.properties.Sex);
-                    }
-                });
-                overLayers["People"] = people;
-                L.control.layers(baseLayers, overLayers).addTo(map);
-                console.log(people)
-                const bboxLayer =L.geoJSON(people.toGeoJSON());
-                const bbox = turf.bbox(bboxLayer.toGeoJSON());
-                var bounds = L.latLngBounds([bbox[1], bbox[0]], [bbox[3], bbox[2]]);
-                var bboxRectangle = L.rectangle(bounds, { color: 'red', weight: 2, fill: false });
-                bboxRectangle.addTo(map);
-            })
-        }).catch(error => console.error(error));
+        })
+        .catch((error) => console.error(error));
 
-        
+      //lejant
+      const legend = L.control({ position: "bottomright" });
 
+      legend.onAdd = function (map) {
+        const div = L.DomUtil.create("div", "info legend");
+        div.innerHTML = legendElement.innerHTML; // Yukarıda oluşturulan lejantın içeriğini ekler
+
+        return div;
+      };
+
+      legend.addTo(map);
     </script>
   </body>
 </html>

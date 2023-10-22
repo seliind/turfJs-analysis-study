@@ -6,3 +6,41 @@
 #map {
   height: 100vh;
 }
+#map-legend {
+  display: none;
+  padding: 10px;
+  font-size: 14px;
+  width: 100%;
+}
+.info.legend{
+  background: white;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px
+}
+.row {
+  margin: 5px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.legend-label {
+  font-size: 24px;
+  color: rgb(44, 44, 49);
+  padding-top: 10px;
+  padding-bottom: 8px;
+}
+.row p {
+  font-size: 18px;
+}
+.legend-img {
+  width: 30px;
+  padding: 3px;
+}
+.icon-container{
+  width: 85px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
